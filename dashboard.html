@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Escolha seu serviço e agende seu horário no Studio by Oliveira.">
+  <meta name="theme-color" content="#17100f">
+  <title>Agende seu horário | VITÓRIA OLIVEIRA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+  <style>.brand-mark{width:58px;height:58px;overflow:hidden;background:#17100f}.brand-mark img{width:100%;height:100%;object-fit:cover}</style>
+</head>
+<body class="dashboard-page">
+  <header class="booking-header">
+    <a class="brand" href="index.html" aria-label="Voltar para o Studio by Oliveira"><span class="brand-mark"><img src="img-logo.png" alt="" aria-hidden="true"></span><span><strong>Studio by Oliveira</strong><small>VITÓRIA OLIVEIRA</small></span></a>
+    <a class="back-link" href="index.html">← Voltar ao site</a>
+  </header>
+  <main>
+    <section class="booking-hero"><div><span class="eyebrow">AGENDA ONLINE</span><h1>Seu momento de cuidado começa aqui.</h1><p>Escolha o serviço, encontre o melhor horário e envie sua solicitação de agendamento.</p></div><span class="hero-number">01</span></section>
+    <section class="client-content">
+      <div class="services-section"><div class="section-title"><span class="eyebrow">SERVIÇOS</span><h2>Escolha seu cuidado</h2></div><div id="serviceGrid" class="service-grid"></div></div>
+      <section class="schedule-section" aria-labelledby="scheduleTitle"><div class="section-title"><span class="eyebrow">RESERVA</span><h2 id="scheduleTitle">Encontre seu horário</h2></div>
+        <form id="appointmentForm" class="appointment-form">
+          <label>Seu nome<input name="client" required placeholder="Como podemos chamar você?"></label>
+          <label>WhatsApp<input name="phone" type="tel" required placeholder="(11) 99999-9999"></label>
+          <label>Serviço<select name="service" id="appointmentService" required></select></label>
+          <div class="form-row"><label>Data<input name="date" id="appointmentDate" type="date" required></label><label>Horário<select name="time" id="appointmentTime" required><option value="">Escolha uma data</option></select></label></div>
+          <label>Observação <span class="optional">opcional</span><textarea name="notes" rows="3" placeholder="Conte se já tem uma ideia de formato ou nail art"></textarea></label>
+          <button class="primary-button" type="submit">Solicitar agendamento <span>↗</span></button><p class="form-note">Seu horário fica reservado após a confirmação pelo WhatsApp.</p>
+        </form>
+      </section>
+    </section>
+  </main>
+  <footer><a class="brand" href="index.html"><span class="brand-mark"><img src="img-logo.png" alt="" aria-hidden="true"></span><span><strong>Studio by Oliveira</strong><small>VITÓRIA OLIVEIRA</small></span></a><p>Beleza, cuidado e personalidade em cada detalhe.</p></footer>
+  <script src="script.js"></script>
+</body>
+</html>
