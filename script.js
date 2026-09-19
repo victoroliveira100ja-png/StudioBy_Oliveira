@@ -83,6 +83,12 @@ if (clientBookingPage) {
     { id: 3, name: 'Esmaltação', price: 'Consultar', duration: '1h' },
     { id: 4, name: 'Nail art', price: 'Consultar', duration: 'Adicional' }
   ];
+
+  const SUPABASE_URL = 'https://mbskearvsmvgqiyqhgwf.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_oismAwIlBz4av9QWJWwnIA_qQRGV2VE';
+  const useSupabase = !!(window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY && !SUPABASE_URL.includes('COLOQUE') && !SUPABASE_ANON_KEY.includes('COLOQUE'));
+  const supabase = useSupabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
   const services = JSON.parse(localStorage.getItem('studioServices')) || defaultServices;
   let bookings = JSON.parse(localStorage.getItem('studioBookings')) || [];
   const availableTimes = ['09:00', '11:00', '14:00', '16:00'];
@@ -97,20 +103,70 @@ if (clientBookingPage) {
   serviceSelect.innerHTML = services.map(item => `<option value="${escapeHTML(item.name)}">${escapeHTML(item.name)}</option>`).join('');
   dateInput.min = new Date().toISOString().split('T')[0];
 
-  const renderAvailableTimes = () => {
+  const getBookedTimes = async (selectedDate) => {
+    if (!supabase || !selectedDate) {
+      return bookings.filter(item => item.date === selectedDate).map(item => item.time);
+    }
+
+    const { data, error } = await supabase
+      .from('reservas')
+      .select('tempo')
+      .eq('data', selectedDate);
+
+    if (error) {
+      console.error('Erro ao consultar reservas:', error);
+      return [];
+    }
+
+    return (data || []).map(item => item.tempo);
+  };
+
+  const renderAvailableTimes = async () => {
     const selectedDate = dateInput.value;
-    const bookedTimes = bookings.filter(item => item.date === selectedDate).map(item => item.time);
+    const bookedTimes = await getBookedTimes(selectedDate);
     const options = availableTimes.filter(time => !bookedTimes.includes(time));
-    timeSelect.innerHTML = options.length ? `<option value="">Escolha um horário</option>${options.map(time => `<option>${time}</option>`).join('')}` : '<option value="">Sem horários nesta data</option>';
+
+    timeSelect.innerHTML = options.length
+      ? `<option value="">Escolha um horário</option>${options.map(time => `<option>${time}</option>`).join('')}`
+      : '<option value="">Sem horários nesta data</option>';
+
     timeSelect.disabled = !selectedDate || !options.length;
   };
 
-  dateInput.addEventListener('change', renderAvailableTimes);
-  appointmentForm.addEventListener('submit', event => {
+  dateInput.addEventListener('change', () => renderAvailableTimes());
+
+  appointmentForm.addEventListener('submit', async event => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.currentTarget));
-    bookings.push({ id: Date.now(), status: 'Aguardando', ...data });
-    localStorage.setItem('studioBookings', JSON.stringify(bookings));
+
+    if (supabase) {
+      const { error } = await supabase.from('reservas').insert([
+        {
+          cliente: data.client,
+          telefone: data.phone,
+          'serviço': data.service,
+          data: data.date,
+          tempo: data.time,
+          notas: data.notes || '',
+          status: 'Aguardando'
+        }
+      ]);
+
+      if (error) {
+        if (error.code === '23505') {
+          alert('Esse horário já foi reservado por outra pessoa.');
+          return;
+        }
+
+        console.error('Erro ao salvar no Supabase:', error);
+        alert('Não foi possível salvar o agendamento. Tente novamente.');
+        return;
+      }
+    } else {
+      bookings.push({ id: Date.now(), status: 'Aguardando', ...data });
+      localStorage.setItem('studioBookings', JSON.stringify(bookings));
+    }
+
     const message = [
       'Oi! Gostaria de solicitar um agendamento pelo site.',
       `Nome: ${data.client}`,
@@ -119,7 +175,9 @@ if (clientBookingPage) {
       `Horário: ${data.time}`,
       data.notes ? `Observação: ${data.notes}` : ''
     ].filter(Boolean).join('\n');
+
     window.location.href = `https://wa.me/5511997449453?text=${encodeURIComponent(message)}`;
   });
+
   renderAvailableTimes();
 }
