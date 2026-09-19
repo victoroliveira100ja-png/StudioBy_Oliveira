@@ -91,7 +91,7 @@ if (clientBookingPage) {
 
   const services = JSON.parse(localStorage.getItem('studioServices')) || defaultServices;
   let bookings = JSON.parse(localStorage.getItem('studioBookings')) || [];
-  const availableTimes = ['09:00', '11:00', '14:00', '16:00'];
+  const availableTimes = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
   const serviceGrid = document.getElementById('serviceGrid');
   const serviceSelect = document.getElementById('appointmentService');
   const dateInput = document.getElementById('appointmentDate');
