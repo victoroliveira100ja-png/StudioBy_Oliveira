@@ -84,10 +84,20 @@ if (clientBookingPage) {
     { id: 4, name: 'Nail art', price: 'Consultar', duration: 'Adicional' }
   ];
 
-  const SUPABASE_URL = 'https://mbskearvsmvgqiyqhgwf.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_oismAwIlBz4av9QWJWwnIA_qQRGV2VE';
-  const useSupabase = !!(window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY && !SUPABASE_URL.includes('COLOQUE') && !SUPABASE_ANON_KEY.includes('COLOQUE'));
-  const supabase = useSupabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+  const FIREBASE_CONFIG = {
+    apiKey: 'AIzaSyAXUSfeCvJY5ZutJOTAPAStEG4wYKQtAag',
+    authDomain: 'studio-by-oliveira.firebaseapp.com',
+    projectId: 'studio-by-oliveira',
+    storageBucket: 'studio-by-oliveira.firebasestorage.app',
+    messagingSenderId: '321012575834',
+    appId: '1:321012575834:web:d9dc468a7e8e0f0f69f263'
+  };
+  const useFirebase = !!(window.firebase && FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.includes('COLOQUE'));
+  let db = null;
+  if (useFirebase) {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+  }
 
   const services = JSON.parse(localStorage.getItem('studioServices')) || defaultServices;
   let bookings = JSON.parse(localStorage.getItem('studioBookings')) || [];
@@ -104,21 +114,17 @@ if (clientBookingPage) {
   dateInput.min = new Date().toISOString().split('T')[0];
 
   const getBookedTimes = async (selectedDate) => {
-    if (!supabase || !selectedDate) {
+    if (!db || !selectedDate) {
       return bookings.filter(item => item.date === selectedDate).map(item => item.time);
     }
 
-    const { data, error } = await supabase
-      .from('reservas')
-      .select('tempo')
-      .eq('data', selectedDate);
-
-    if (error) {
+    try {
+      const snapshot = await db.collection('reservas').where('data', '==', selectedDate).get();
+      return snapshot.docs.map(doc => doc.data().tempo);
+    } catch (error) {
       console.error('Erro ao consultar reservas:', error);
       return [];
     }
-
-    return (data || []).map(item => item.tempo);
   };
 
   const renderAvailableTimes = async () => {
@@ -139,26 +145,26 @@ if (clientBookingPage) {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.currentTarget));
 
-    if (supabase) {
-      const { error } = await supabase.from('reservas').insert([
-        {
+    if (db) {
+      try {
+        const existing = await db.collection('reservas').where('data', '==', data.date).where('tempo', '==', data.time).get();
+        if (!existing.empty) {
+          alert('Esse horário já foi reservado por outra pessoa.');
+          return;
+        }
+
+        await db.collection('reservas').add({
           cliente: data.client,
           telefone: data.phone,
           'serviço': data.service,
           data: data.date,
           tempo: data.time,
           notas: data.notes || '',
-          status: 'Aguardando'
-        }
-      ]);
-
-      if (error) {
-        if (error.code === '23505') {
-          alert('Esse horário já foi reservado por outra pessoa.');
-          return;
-        }
-
-        console.error('Erro ao salvar no Supabase:', error);
+          status: 'Aguardando',
+          criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (error) {
+        console.error('Erro ao salvar no Firestore:', error);
         alert('Não foi possível salvar o agendamento. Tente novamente.');
         return;
       }
