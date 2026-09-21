@@ -15,7 +15,10 @@
 <body class="dashboard-page">
   <header class="booking-header">
     <a class="brand" href="index.html" aria-label="Voltar para o Studio by Oliveira"><span class="brand-mark"><img src="img-logo.png" alt="" aria-hidden="true"></span><span><strong>Studio by Oliveira</strong><small>VITÓRIA OLIVEIRA</small></span></a>
-    <a class="back-link" href="index.html">← Voltar ao site</a>
+    <div style="display:flex;gap:24px;align-items:center">
+      <a class="back-link" href="meus-agendamentos.html">Meus agendamentos</a>
+      <a class="back-link" href="index.html">← Voltar ao site</a>
+    </div>
   </header>
   <main>
     <section class="booking-hero"><div><span class="eyebrow">AGENDA ONLINE</span><h1>Seu momento de cuidado começa aqui.</h1><p>Escolha o serviço, encontre o melhor horário e envie sua solicitação de agendamento.</p></div><span class="hero-number">01</span></section>
@@ -25,6 +28,8 @@
         <form id="appointmentForm" class="appointment-form">
           <label>Seu nome<input name="client" required placeholder="Como podemos chamar você?"></label>
           <label>WhatsApp<input name="phone" type="tel" required placeholder="(11) 99999-9999"></label>
+          <label>E-mail<input name="email" type="email" required placeholder="seuemail@exemplo.com"></label>
+          <label>Crie uma senha <span class="optional">para acessar "Meus agendamentos" depois</span><input name="password" type="password" required minlength="6" placeholder="Mínimo 6 caracteres"></label>
           <label>Serviço<select name="service" id="appointmentService" required></select></label>
           <div class="form-row"><label>Data<input name="date" id="appointmentDate" type="date" required></label><label>Horário<select name="time" id="appointmentTime" required><option value="">Escolha uma data</option></select></label></div>
           <label>Observação <span class="optional">opcional</span><textarea name="notes" rows="3" placeholder="Conte se já tem uma ideia de formato ou nail art"></textarea></label>
@@ -35,6 +40,7 @@
   </main>
   <footer><a class="brand" href="index.html"><span class="brand-mark"><img src="img-logo.png" alt="" aria-hidden="true"></span><span><strong>Studio by Oliveira</strong><small>VITÓRIA OLIVEIRA</small></span></a><p>Beleza, cuidado e personalidade em cada detalhe.</p></footer>
   <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
   <script src="script.js"></script>
 </body>
