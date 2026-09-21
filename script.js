@@ -94,9 +94,11 @@ if (clientBookingPage) {
   };
   const useFirebase = !!(window.firebase && FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.includes('COLOQUE'));
   let db = null;
+  let auth = null;
   if (useFirebase) {
     firebase.initializeApp(FIREBASE_CONFIG);
     db = firebase.firestore();
+    auth = firebase.auth();
   }
 
   const services = JSON.parse(localStorage.getItem('studioServices')) || defaultServices;
@@ -141,11 +143,39 @@ if (clientBookingPage) {
 
   dateInput.addEventListener('change', () => renderAvailableTimes());
 
+  const ensureAccount = async (email, password) => {
+    try {
+      const credential = await auth.signInWithEmailAndPassword(email, password);
+      return credential.user;
+    } catch (error) {
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+        const credential = await auth.createUserWithEmailAndPassword(email, password);
+        return credential.user;
+      }
+      if (error.code === 'auth/wrong-password') {
+        throw new Error('Já existe uma conta com esse e-mail, mas a senha não confere. Confirme a senha que você criou antes.');
+      }
+      if (error.code === 'auth/email-already-in-use') {
+        throw new Error('Esse e-mail já tem uma conta. Use a senha que você já criou antes.');
+      }
+      throw error;
+    }
+  };
+
   appointmentForm.addEventListener('submit', async event => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.currentTarget));
 
-    if (db) {
+    if (db && auth) {
+      let user;
+      try {
+        user = await ensureAccount(data.email, data.password);
+      } catch (error) {
+        console.error('Erro de autenticação:', error);
+        alert(error.message || 'Não foi possível criar/entrar na sua conta. Verifique e-mail e senha.');
+        return;
+      }
+
       try {
         const existing = await db.collection('reservas').where('data', '==', data.date).where('tempo', '==', data.time).get();
         if (!existing.empty) {
@@ -154,8 +184,10 @@ if (clientBookingPage) {
         }
 
         await db.collection('reservas').add({
+          uid: user.uid,
           cliente: data.client,
           telefone: data.phone,
+          telefoneNormalizado: data.phone.replace(/\D/g, ''),
           'serviço': data.service,
           data: data.date,
           tempo: data.time,
