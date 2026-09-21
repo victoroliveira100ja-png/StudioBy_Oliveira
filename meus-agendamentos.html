@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Entre para consultar, confirmar ou cancelar seu agendamento no Studio by Oliveira.">
+  <meta name="theme-color" content="#17100f">
+  <title>Meus agendamentos | Studio by Oliveira</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+  <style>
+    .brand-mark{width:58px;height:58px;overflow:hidden;background:#17100f}
+    .brand-mark img{width:100%;height:100%;object-fit:cover}
+    .lookup-main{max-width:640px;margin:0 auto;padding:90px clamp(24px,7vw,112px) 100px}
+    .lookup-card-form{background:var(--paper);border-top:3px solid var(--rose);padding:34px 36px}
+    .lookup-card-form label{display:grid;gap:7px;font-size:13px;margin-bottom:16px}
+    .lookup-card-form input{width:100%;border:1px solid var(--line);background:white;padding:13px;outline:0;color:var(--ink)}
+    .lookup-card-form input:focus{border-color:var(--rose)}
+    .lookup-card-form .primary-button{width:100%;justify-content:center}
+    .lookup-error{background:#f7e3e0;color:#8a3d33;font-size:13px;padding:10px 12px;margin-bottom:16px;display:none}
+    .lookup-error.visible{display:block}
+    .lookup-forgot{display:block;text-align:center;margin-top:14px;font-size:13px;border-bottom:1px solid var(--ink);width:max-content;margin-left:auto;margin-right:auto;padding-bottom:2px;background:transparent;border-top:0;border-left:0;border-right:0;cursor:pointer;color:var(--ink)}
+    .lookup-results{margin-top:28px;display:grid;gap:14px}
+    .lookup-item{background:var(--paper);border:1px solid var(--line);padding:20px 22px;display:grid;gap:12px}
+    .lookup-item strong{font:500 20px var(--serif);display:block}
+    .lookup-item small{color:var(--muted);display:block;margin-top:3px}
+    .lookup-item .lookup-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .lookup-item button{border:0;padding:11px 16px;font-weight:600;font-size:13px;cursor:pointer}
+    .lookup-item .confirm-btn{background:var(--ink);color:white}
+    .lookup-item .cancel-btn{background:transparent;border:1px solid var(--ink);color:var(--ink)}
+    .lookup-empty,.lookup-loading{color:var(--muted);text-align:center;padding:20px 0}
+    .lookup-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+    .lookup-topbar button{border:0;background:transparent;font-size:13px;border-bottom:1px solid var(--ink);padding-bottom:2px;cursor:pointer;color:var(--ink)}
+    [hidden]{display:none!important}
+  </style>
+</head>
+<body class="dashboard-page">
+  <header class="booking-header">
+    <a class="brand" href="index.html" aria-label="Voltar para o Studio by Oliveira"><span class="brand-mark"><img src="img-logo.png" alt="" aria-hidden="true"></span><span><strong>Studio by Oliveira</strong><small>VITÓRIA OLIVEIRA</small></span></a>
+    <a class="back-link" href="index.html">← Voltar ao site</a>
+  </header>
+  <main class="lookup-main">
+    <div class="section-title"><span class="eyebrow">MEUS AGENDAMENTOS</span><h2>Entre na sua conta</h2></div>
+
+    <div id="loginBlock" class="lookup-card-form">
+      <div id="loginError" class="lookup-error" role="alert"></div>
+      <form id="loginForm">
+        <label>E-mail<input name="email" type="email" required autocomplete="username"></label>
+        <label>Senha<input name="password" type="password" required autocomplete="current-password"></label>
+        <button class="primary-button" type="submit">Entrar</button>
+      </form>
+      <button id="forgotButton" class="lookup-forgot" type="button">Esqueci minha senha</button>
+      <p class="form-note" style="text-align:center;margin-top:18px">Use o mesmo e-mail e senha criados na hora do agendamento.</p>
+    </div>
+
+    <div id="appBlock" hidden>
+      <div class="lookup-topbar">
+        <span id="welcomeText"></span>
+        <button id="logoutButton" type="button">Sair da conta</button>
+      </div>
+      <div id="resultsArea" class="lookup-results"></div>
+    </div>
+  </main>
+  <footer><a class="brand" href="index.html"><span class="brand-mark"><img src="img-logo.png" alt="" aria-hidden="true"></span><span><strong>Studio by Oliveira</strong><small>VITÓRIA OLIVEIRA</small></span></a><p>Beleza, cuidado e personalidade em cada detalhe.</p></footer>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+  <script src="meus-agendamentos.js"></script>
+</body>
+</html>
